@@ -1,4 +1,4 @@
-package mpc.hc.api;
+package com.eeeeeric.mpc.hc.api;
 
 
 import java.io.IOException;
@@ -483,6 +483,17 @@ public class MediaPlayerClassicHomeCinema
     {
       jump(-15);
     }
+  }
+
+  /**
+   * Toggle fullscreen.
+   *
+   * @throws IOException
+   *         If the HTTP call receives an unexpected response code
+   */
+  public void toggleFullscreen() throws IOException
+  {
+    execute(WMCommand.FULLSCREEN);
   }
 
   /**

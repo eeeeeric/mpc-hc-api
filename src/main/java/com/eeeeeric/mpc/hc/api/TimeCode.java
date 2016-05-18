@@ -1,4 +1,4 @@
-package mpc.hc.api;
+package com.eeeeeric.mpc.hc.api;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 

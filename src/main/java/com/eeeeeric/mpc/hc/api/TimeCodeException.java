@@ -1,4 +1,4 @@
-package mpc.hc.api;
+package com.eeeeeric.mpc.hc.api;
 
 /**
  * Exception thrown by {@link TimeCode}

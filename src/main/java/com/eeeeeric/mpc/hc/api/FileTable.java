@@ -1,4 +1,4 @@
-package mpc.hc.api;
+package com.eeeeeric.mpc.hc.api;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ public class FileTable
    */
   public FileTable(Element element)
   {
-    files = new ArrayList<FileInfo>();
+    files = new ArrayList<>();
 
     for (Element row : element.getElementsByTag("tr"))
     {
