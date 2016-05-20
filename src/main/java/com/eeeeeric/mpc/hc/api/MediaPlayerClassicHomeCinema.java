@@ -11,11 +11,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MediaPlayerClassicHomeCinema
 {
@@ -183,17 +182,16 @@ public class MediaPlayerClassicHomeCinema
   public void execute(final WMCommand command,
           KeyValuePair... args) throws IOException
   {
-    FormEncodingBuilder builder = new FormEncodingBuilder()
+    FormBody.Builder formBuilder = new FormBody.Builder()
             .add("wm_command", Integer.toString(command.getValue()));
     for (KeyValuePair arg : args)
     {
-      builder = builder.add(arg.getKey(), arg.getValue());
+      formBuilder.add(arg.getKey(), arg.getValue());
     }
-    RequestBody formBody = builder.build();
 
     Request request = new Request.Builder()
             .url(commandEndPoint)
-            .post(formBody)
+            .post(formBuilder.build())
             .build();
 
     Response response = client.newCall(request).execute();

@@ -1,11 +1,9 @@
 package com.eeeeeric.mpc.hc.api;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-
 /**
  * An object representation of the HH:MM:SS time code.
  */
-public class TimeCode
+public class TimeCode implements Comparable<TimeCode>
 {
   /**
    * The {@link TimeCodeException} should never be thrown.
@@ -205,18 +203,42 @@ public class TimeCode
     }
   }
 
+  /** {@inheritDoc} */
   @Override
-  public boolean equals(Object object)
+  public int compareTo(TimeCode o)
   {
-    return EqualsBuilder.reflectionEquals(this, object);
+    return Integer.compare(totalSeconds, o.totalSeconds);
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public boolean equals(Object o)
+  {
+    if (this == o)
+    {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass())
+    {
+      return false;
+    }
+    TimeCode timeCode = (TimeCode) o;
+    return totalSeconds == timeCode.totalSeconds;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public int hashCode()
+  {
+    return totalSeconds;
+  }
+
+  /** {@inheritDoc} */
   @Override
   public String toString()
   {
     return Integer.toString(hours) + ":" +
            Integer.toString(minutes) + ":" +
            Integer.toString(seconds);
-
   }
 }

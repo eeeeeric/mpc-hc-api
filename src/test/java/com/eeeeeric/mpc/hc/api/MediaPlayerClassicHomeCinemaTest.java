@@ -9,6 +9,8 @@ import org.testng.annotations.Test;
 
 /**
  * Contains tests for {@link MediaPlayerClassicHomeCinema}.
+ *
+ * These tests require an instance of MPC-HC to be running.
  */
 @Test
 public class MediaPlayerClassicHomeCinemaTest

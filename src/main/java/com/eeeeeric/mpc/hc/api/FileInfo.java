@@ -18,7 +18,7 @@ public class FileInfo
    * @param name
    *        The file name
    * @param href
-   *        The hyperlink that can either be used to access the {@FileTable}
+   *        The hyperlink that can either be used to access the {@link FileTable}
    *        for this directory (if this is a directory), or to play this file
    *        with MPC-HC
    * @param type
