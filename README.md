@@ -13,7 +13,7 @@ mpc-hc-api is available on Maven Central. Simply add it as a dependency to your 
 <dependency>
   <groupId>com.eeeeeric</groupId>
   <artifactId>mpc-hc-api</artifactId>
-  <version>1.0.0</version>
+  <version>0.1.0</version>
 </dependency>
 ```
 
@@ -34,8 +34,7 @@ Now in your Java application...
 MediaPlayerClassicHomeCinema mpc = new MediaPlayerClassicHomeCinema("127.0.0.1", 55555);
 
 // Browse for files
-FileTable root = mpc.browse();
-List<FileInfo> files = root.getFiles();
+List<FileInfo> files = mpc.browse();
 
 // Realistically, you'll want to display this in your UI, and let the user
 // navigate the file tree, and select a file for playback

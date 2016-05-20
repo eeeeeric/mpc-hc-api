@@ -31,7 +31,7 @@
 
   <groupId>com.eeeeeric</groupId>
   <artifactId>mpc-hc-api</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>0.1.0-SNAPSHOT</version>
 
   <properties>
     <languageLevel>1.7</languageLevel>

@@ -3,6 +3,7 @@ package com.eeeeeric.mpc.hc.api;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,24 +17,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * Client for the web interface exposed by MPC-HC.
+ */
 public class MediaPlayerClassicHomeCinema
 {
-  private String baseAddress;
-  private String commandEndPoint;
-  private String infoEndPoint;
-  private String variableEndPoint;
-  private OkHttpClient client;
-
-  private static final Pattern VERSION_PATTERN =
-          Pattern.compile("« (MPC-HC v\\d+.\\d+.\\d+.\\d+).*");
-  private static final String BROWSER_ROOT_HREF = "/browser.html?path=";
-  private static final String VARIABLE_IDS[] = new String[] {
-          "filepatharg", "filepath", "filedirarg", "filedir", "state",
-          "statestring", "position", "positionstring", "duration",
-          "durationstring", "volumelevel", "muted", "playbackrate",
-          "reloadtime"
-  };
-
   /**
    * A pair of {@link String}s.
    */
@@ -77,50 +65,68 @@ public class MediaPlayerClassicHomeCinema
     }
   }
 
+
+  private String baseURI;
+  private String commandEndPoint;
+  private String infoEndPoint;
+  private String variableEndPoint;
+
+  private OkHttpClient okHttpClient;
+
+  private static final Pattern VERSION_PATTERN =
+          Pattern.compile("« (MPC-HC v\\d+.\\d+.\\d+.\\d+).*");
+  private static final String BROWSER_ROOT_URI_PATH = "/browser.html?path=";
+
+  private static final String VARIABLE_IDS[] = new String[] {
+          "filepatharg", "filepath", "filedirarg", "filedir", "state",
+          "statestring", "position", "positionstring", "duration",
+          "durationstring", "volumelevel", "muted", "playbackrate",
+          "reloadtime"
+  };
+
   /**
    * Construct a new instance of the media player.
    *
-   * @param ipAddress
-   *        The IP address of the machine that MPC-HC is running on
+   * @param hostname
+   *        The hostname or IP address of the machine that MPC-HC is running on
    * @param port
    *        The port that MPC-HC is listening on
    */
-  public MediaPlayerClassicHomeCinema(String ipAddress, int port)
+  public MediaPlayerClassicHomeCinema(String hostname, int port)
   {
-    baseAddress = "http://" + ipAddress + ":" + Integer.toString(port);
-
-    client = new OkHttpClient();
-    commandEndPoint = baseAddress + "/command.html";
-    infoEndPoint = baseAddress + "/info.html";
-    variableEndPoint = baseAddress + "/variables.html";
+    baseURI = "http://" + hostname + ":" + Integer.toString(port);
+    commandEndPoint = baseURI + "/command.html";
+    infoEndPoint = baseURI + "/info.html";
+    variableEndPoint = baseURI + "/variables.html";
+    okHttpClient = new OkHttpClient();
   }
 
   /**
-   * Get the {@link FileTable} for the system root. This is a listing of all
-   * attached drives, e.g. A:\, C:\, D:\.
+   * Get a list of {@link FileInfo} objects for the system root.
+   * This is a listing of all attached drives, e.g. A:\, C:\, D:\.
    *
-   * @return The {@link FileTable} for the system root
+   * @return The file listing for the system root
    *
    * @throws IOException
    *         If the HTTP call receives an unexpected response code
    */
-  public FileTable browse() throws IOException
+  public List<FileInfo> browse() throws IOException
   {
-    return browse(BROWSER_ROOT_HREF);
+    return browse(BROWSER_ROOT_URI_PATH);
   }
 
   /**
-   * Get the {@link FileTable} for the given path.
+   * Get a list of {@link FileInfo} objects for the given path.
    *
    * @param file
    *        The FileInfo object from the FileTable
    *
-   * @return The {@link FileTable} for the given path
+   * @return A list of {@link FileInfo} objects for the given path
    *
    * @throws IOException
    *         If the HTTP call receives an unexpected response code
    */
-  public FileTable browse(FileInfo file) throws IOException
+  public List<FileInfo> browse(FileInfo file) throws IOException
   {
     if (!file.isDirectory())
     {
@@ -130,24 +136,24 @@ public class MediaPlayerClassicHomeCinema
   }
 
   /**
-   * Get the {@link FileTable} for the given path.
+   * Get a list of {@link FileInfo} objects for the given path.
    *
    * @param href
    *        The relative path to the file, as returned by
    *        {@link FileInfo#getHref()}
    *
-   * @return The {@link FileTable} for the given path
+   * @return A list of {@link FileInfo} objects for the given path
    *
    * @throws IOException
    *         If the HTTP call receives an unexpected response code
    */
-  FileTable browse(String href) throws IOException
+  List<FileInfo> browse(String href) throws IOException
   {
-    Response response = get(baseAddress + href);
+    Response response = get(baseURI + href);
     Document document = Jsoup.parse(response.body().string());
 
     Element table = document.getElementsByClass("browser-table").get(1);
-    return new FileTable(table);
+    return FileInfo.fromHTMLTableElement(table);
   }
 
   /**
@@ -165,7 +171,7 @@ public class MediaPlayerClassicHomeCinema
     {
       throw new IllegalArgumentException("Argument must be a file");
     }
-    get(baseAddress + file.getHref());
+    get(baseURI + file.getHref());
   }
 
   /**
@@ -194,7 +200,7 @@ public class MediaPlayerClassicHomeCinema
             .post(formBuilder.build())
             .build();
 
-    Response response = client.newCall(request).execute();
+    Response response = okHttpClient.newCall(request).execute();
     if (!response.isSuccessful())
     {
       throw new IOException("Unexpected code: " + response);
@@ -258,7 +264,7 @@ public class MediaPlayerClassicHomeCinema
             .url(url)
             .build();
 
-    Response response = client.newCall(request).execute();
+    Response response = okHttpClient.newCall(request).execute();
     if (!response.isSuccessful())
     {
       throw new IOException("Unexpected code: " + response);
@@ -267,9 +273,11 @@ public class MediaPlayerClassicHomeCinema
     return response;
   }
 
-  /**
-   * Convenience methods for common operations.
-   */
+
+  //
+  // Convenience methods
+  //
+
 
   /**
    * Toggle the mute state of the player.
@@ -299,7 +307,7 @@ public class MediaPlayerClassicHomeCinema
    * Set mute on the player.
    *
    * @param mute
-   *        If true, mute the player. If false, unmute.
+   *        If {@code true}, mute the player. If {@code false}, unmute.
    *
    * @throws IOException
    *         If the HTTP call receives an unexpected response code

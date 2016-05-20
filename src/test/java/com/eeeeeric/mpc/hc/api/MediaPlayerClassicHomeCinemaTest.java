@@ -1,6 +1,7 @@
 package com.eeeeeric.mpc.hc.api;
 
 import java.net.URLEncoder;
+import java.util.List;
 
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -53,9 +54,9 @@ public class MediaPlayerClassicHomeCinemaTest
             0, mediaFileOnHost.lastIndexOf('\\'));
     String fileName = mediaFileOnHost.substring(
             mediaFileOnHost.lastIndexOf('\\') + 1);
-    FileTable fileTable = mpc.browse("/browser.html?path="
+    List<FileInfo> files = mpc.browse("/browser.html?path="
             + URLEncoder.encode(parentDir, "UTF-8"));
-    for (FileInfo file : fileTable.getFiles())
+    for (FileInfo file : files)
     {
       if (file.getFileName().equals(fileName))
       {
