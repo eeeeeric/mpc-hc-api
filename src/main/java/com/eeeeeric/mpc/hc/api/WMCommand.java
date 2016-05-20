@@ -1,5 +1,8 @@
 package com.eeeeeric.mpc.hc.api;
 
+/**
+ * These are commands that MPC-HC recognizes.
+ */
 public enum WMCommand
 {
   SET_VOLUME("Set Volume", -2),
@@ -189,17 +192,36 @@ public enum WMCommand
 
   private String commandName;
   private int value;
+
+  /**
+   * Create a new instance.
+   *
+   * @param commandName
+   *        A human friendly string of what the command does
+   * @param value
+   *        The integer command code
+   */
   WMCommand(String commandName, int value)
   {
     this.commandName = commandName;
     this.value = value;
   }
 
+  /**
+   * Returns a human friendly string of what the command does
+   *
+   * @return a human friendly string of what the command does
+   */
   public String getCommandName()
   {
     return commandName;
   }
 
+  /**
+   * Returns the integer command code.
+   *
+   * @return the integer command code.
+   */
   public int getValue()
   {
     return value;

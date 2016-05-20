@@ -55,7 +55,7 @@ public class MediaPlayerClassicHomeCinemaTest
             + URLEncoder.encode(parentDir, "UTF-8"));
     for (FileInfo file : fileTable.getFiles())
     {
-      if (file.getName().equals(fileName))
+      if (file.getFileName().equals(fileName))
       {
         mpc.openFile(file);
         break;
@@ -72,8 +72,11 @@ public class MediaPlayerClassicHomeCinemaTest
     mpc.setVolume(50);
     Assert.assertEquals(mpc.getVolume(), 50);
     mpc.pause();
+    Assert.assertTrue(mpc.isPaused());
     TimeCode fiveMinutes = new TimeCode("00:05:00");
     mpc.seek(fiveMinutes);
     Assert.assertEquals(mpc.getPosition(), fiveMinutes);
+    mpc.play();
+    Assert.assertTrue(mpc.isPlaying());
   }
 }

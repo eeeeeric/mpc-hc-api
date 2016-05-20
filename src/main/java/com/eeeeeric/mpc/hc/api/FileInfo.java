@@ -41,32 +41,62 @@ public class FileInfo
     this.isDirectory = isDirectory;
   }
 
+  /**
+   * Returns {@code true} if the file is a directory.
+   *
+   * @return {@code true} if the file is a directory.
+   */
   public boolean isDirectory()
   {
     return isDirectory;
   }
 
-  public String getName()
+  /**
+   * Returns the name of the file.
+   *
+   * @return the name of the file
+   */
+  public String getFileName()
   {
     return name;
   }
 
+  /**
+   * Returns the relative hyperlink to the file.
+   *
+   * @return the relative hyperlink to the file
+   */
   public String getHref()
   {
     return href;
   }
 
-  public String getType()
+  /**
+   * Returns the file type.
+   *
+   * @return the file type
+   */
+  public String getFileType()
   {
     return type;
   }
 
-  public String getSize()
+  /**
+   * Returns the size of the file.
+   *
+   * @return the size of the file
+   */
+  public String getFileSize()
   {
     return size;
   }
 
-  public String getDate()
+  /**
+   * Returns the timestamp of when this file was last modified.
+   *
+   * @return the timestamp of when this file was last modified
+   */
+  public String getLastModified()
   {
     return date;
   }

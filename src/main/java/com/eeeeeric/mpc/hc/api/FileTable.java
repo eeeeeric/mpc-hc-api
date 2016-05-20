@@ -8,7 +8,7 @@ import org.jsoup.select.Elements;
 
 /**
  * This class represents the table of files returned by MPC-HC's web
- * interface file browser.
+ * interface file browser. Typically, this relates to a directory.
  */
 public class FileTable
 {
@@ -61,7 +61,8 @@ public class FileTable
    * @param elements
    *        The row of elements
    *
-   * @return True if the elements represent a directory, false otherwise
+   * @return {@code true} if the elements represent a directory,
+   *         {@code false} otherwise
    */
   private boolean isDirectory(Elements elements)
   {
@@ -76,6 +77,11 @@ public class FileTable
     return false;
   }
 
+  /**
+   * Returns a list of files in the table.
+   *
+   * @return a list of files in the table
+   */
   public List<FileInfo> getFiles()
   {
     return files;

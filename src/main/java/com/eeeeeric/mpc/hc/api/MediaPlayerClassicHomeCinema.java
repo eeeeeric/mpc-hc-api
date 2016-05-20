@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,7 +20,6 @@ import com.squareup.okhttp.Response;
 public class MediaPlayerClassicHomeCinema
 {
   private String baseAddress;
-  private String browserEndPoint;
   private String commandEndPoint;
   private String infoEndPoint;
   private String variableEndPoint;
@@ -39,6 +36,49 @@ public class MediaPlayerClassicHomeCinema
   };
 
   /**
+   * A pair of {@link String}s.
+   */
+  public static class KeyValuePair
+  {
+    private final String key;
+    private final String value;
+
+    /**
+     * Create a new instance.
+     *
+     * @param key
+     *        The key
+     * @param value
+     *        The value
+     */
+    public KeyValuePair(String key, String value)
+    {
+      this.key = key;
+      this.value = value;
+    }
+
+    /**
+     * Returns the key.
+     *
+     * @return the key
+     */
+    public String getKey()
+    {
+      return key;
+    }
+
+    /**
+     * Returns the value.
+     *
+     * @return the value
+     */
+    public String getValue()
+    {
+      return value;
+    }
+  }
+
+  /**
    * Construct a new instance of the media player.
    *
    * @param ipAddress
@@ -51,7 +91,6 @@ public class MediaPlayerClassicHomeCinema
     baseAddress = "http://" + ipAddress + ":" + Integer.toString(port);
 
     client = new OkHttpClient();
-    browserEndPoint = baseAddress + "browser.html";
     commandEndPoint = baseAddress + "/command.html";
     infoEndPoint = baseAddress + "/info.html";
     variableEndPoint = baseAddress + "/variables.html";
@@ -74,15 +113,36 @@ public class MediaPlayerClassicHomeCinema
   /**
    * Get the {@link FileTable} for the given path.
    *
-   * @param href
-   *        The link for a path on the file system
+   * @param file
+   *        The FileInfo object from the FileTable
    *
    * @return The {@link FileTable} for the given path
    *
    * @throws IOException
    *         If the HTTP call receives an unexpected response code
    */
-  public FileTable browse(String href) throws IOException
+  public FileTable browse(FileInfo file) throws IOException
+  {
+    if (!file.isDirectory())
+    {
+      throw new IllegalArgumentException("Argument must be a directory");
+    }
+    return browse(file.getHref());
+  }
+
+  /**
+   * Get the {@link FileTable} for the given path.
+   *
+   * @param href
+   *        The relative path to the file, as returned by
+   *        {@link FileInfo#getHref()}
+   *
+   * @return The {@link FileTable} for the given path
+   *
+   * @throws IOException
+   *         If the HTTP call receives an unexpected response code
+   */
+  FileTable browse(String href) throws IOException
   {
     Response response = get(baseAddress + href);
     Document document = Jsoup.parse(response.body().string());
@@ -102,6 +162,10 @@ public class MediaPlayerClassicHomeCinema
    */
   public void openFile(FileInfo file) throws IOException
   {
+    if (file.isDirectory())
+    {
+      throw new IllegalArgumentException("Argument must be a file");
+    }
     get(baseAddress + file.getHref());
   }
 
@@ -117,11 +181,11 @@ public class MediaPlayerClassicHomeCinema
    *         If the HTTP call receives an unexpected response code
    */
   public void execute(final WMCommand command,
-          Pair<String, String>... args) throws IOException
+          KeyValuePair... args) throws IOException
   {
     FormEncodingBuilder builder = new FormEncodingBuilder()
             .add("wm_command", Integer.toString(command.getValue()));
-    for (Pair<String, String> arg : args)
+    for (KeyValuePair arg : args)
     {
       builder = builder.add(arg.getKey(), arg.getValue());
     }
@@ -394,7 +458,7 @@ public class MediaPlayerClassicHomeCinema
     }
 
     execute(WMCommand.SET_VOLUME,
-                   new MutablePair<String, String>("volume", Integer.toString(volume)));
+                   new KeyValuePair("volume", Integer.toString(volume)));
   }
 
   /**
@@ -415,7 +479,7 @@ public class MediaPlayerClassicHomeCinema
       where = getDuration();
     }
     execute(WMCommand.SEEK,
-                   new MutablePair<String, String>("position", where.toString()));
+            new KeyValuePair("position", where.toString()));
   }
 
   /**
@@ -463,26 +527,6 @@ public class MediaPlayerClassicHomeCinema
     }
 
     seek(destination);
-  }
-
-  /**
-   * Seek to the position 15 seconds prior, a la Netflix.
-   *
-   * @throws IOException
-   *         If the HTTP call receives an unexpected response code
-   * @throws TimeCodeException
-   *         This should never happen
-   */
-  public void jumpBack15Seconds() throws IOException, TimeCodeException
-  {
-    if (getPosition().getTotalSeconds() <= 15)
-    {
-      seekToStart();
-    }
-    else
-    {
-      jump(-15);
-    }
   }
 
   /**
